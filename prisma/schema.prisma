@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Products {
+  PID         String   @id @default(uuid())         // Primary Key using UUID
+  Title       String   @unique                      // Unique title for each product
+  Description String?                              // Optional description
+  Detail      String?                              // Optional detailed information
+  Price       Float                                 // Non-negative product price
+  Category    String                                // Product category
+  Status      Int      @default(2)                 // Status indicating availability
+  Images      Images[]                              // Relation to Images
+  CreatedAt   DateTime @default(now())              // Automatically sets the current timestamp when created
+  UpdatedAt   DateTime @updatedAt                   // Automatically updates the timestamp when modified
+}
+
+model Images {
+  ImgID      String   @id @default(uuid())          // Primary Key using UUID
+  PID        String                                  // Foreign Key referencing Products
+  ImageData  Bytes                                  // Column to store image binary data
+
+  Product    Products @relation(fields: [PID], references: [PID], onDelete: Cascade) // Relation to Products
+
+  CreatedAt  DateTime @default(now())               // Automatically sets the current timestamp when created
+  UpdatedAt  DateTime @updatedAt                    // Automatically updates the timestamp when modified
+}
+
+model Categories {
+  CID             String      @id @default(uuid())
+  Category_name   String      @unique
+}
+
